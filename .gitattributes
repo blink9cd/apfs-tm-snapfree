@@ -1,0 +1,6 @@
+# Every text file is stored and checked out with LF line endings, whatever core.autocrlf
+# says on the machine that clones this repository. The tool writes LF, and the committed
+# sample outputs are compared with its output line for line by samples/README.md, so a
+# checkout that turned them into CRLF would fail that comparison on a tree nobody had
+# changed.
+* text=auto eol=lf

@@ -1,0 +1,8 @@
+ok fstab line: UUID=00000000-0000-4000-8000-000000000001 at <tmp>/throwaway
+FAIL mounted: nothing is mounted at <tmp>/throwaway: it is on its parent's volume
+WARN right volume: skipped (not mounted)
+WARN Time Machine excluded: skipped (not mounted)
+WARN Spotlight off: skipped (not mounted)
+WARN ownership honored: skipped (not mounted)
+WARN use against quota: skipped (not mounted)
+ok retired volume pending: none

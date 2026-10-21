@@ -1,0 +1,4 @@
+# A stand-in fstab for the samples, with one line for a throwaway folder that nothing is
+# mounted on. <tmp> is a placeholder: samples/README.md replaces it with a temporary
+# folder before the run. The UUID is an obvious fake, and nothing ever looks it up.
+UUID=00000000-0000-4000-8000-000000000001 <tmp>/throwaway apfs rw,nobrowse

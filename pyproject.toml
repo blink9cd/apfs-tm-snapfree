@@ -1,0 +1,142 @@
+[project]
+name = "apfs-tm-snapfree"
+version = "0.1.0"
+description = "Move a churning folder onto its own APFS volume, excluded whole from Time Machine"
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+# The oldest runtime this tool supports, and deliberately an old one: a stock Mac's only
+# python3 is the Command Line Tools' 3.9, and this tool must run on a Mac with nothing
+# installed. The tests are standard-library unittest for the same reason, so
+# `python3 -m unittest discover` runs the whole suite there too.
+requires-python = ">=3.9"
+# Deliberately empty: standard library only, runtime and tests alike.
+dependencies = []
+
+[project.optional-dependencies]
+# Declared, and empty: the suite needs nothing beyond the standard library, and an
+# explicit empty group says so rather than leaving a reader to wonder what is missing.
+test = []
+
+[tool.ruff]
+target-version = "py39"
+
+[tool.ruff.lint]
+# E4/E7/E9/F are ruff's classic default set, written out so the enabled rules are a
+# function of this file rather than of whichever ruff release is installed. PGH003 and
+# PGH004 flag a bare `# type: ignore` or `# noqa`, one that names no rule code. D adds the
+# docstring rules (pep257), minus D401's imperative-mood opinion, which flags valid
+# noun-phrase summaries.
+select = ["E4", "E7", "E9", "F", "PGH003", "PGH004", "D"]
+ignore = ["D401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.per-file-ignores]
+# Test method names say what each test does; a docstring per test would be noise.
+"**/test_*.py" = ["D"]
+
+[tool.mypy]
+# mypy's oldest supported target, one above requires-python: mypy refuses 3.9. Running
+# the suite under a real 3.9 interpreter covers the names that differ between the two.
+python_version = "3.10"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+# The entry point and the tests import src/'s modules and the vendored stdio library by
+# bare name, after putting their folders on sys.path at runtime; mypy cannot see a
+# runtime sys.path insert, so it is told here.
+mypy_path = [
+  "$MYPY_CONFIG_FILE_DIR/stdio_utf8",
+  "$MYPY_CONFIG_FILE_DIR/src",
+]
+
+[tool.coverage.report]
+# `# pragma: only-on posix` marks a line only a POSIX host runs, and
+# `# pragma: only-on win32` one only Windows runs. Each is excluded on the other kind of
+# host alone, so both stay measured where they run. coverage.py's configuration can read
+# environment variables but not the platform, so it keys on OS: Windows sets it to
+# Windows_NT in every process and POSIX systems leave it unset, so a set OS reads as
+# Windows. With OS unset, ${OS-} is empty: the first pattern ends in (?!), which never
+# matches, and the second is plain. With OS set, the first matches, and the second would
+# need "win32" to run straight into "Windows_NT" across a word boundary, which cannot
+# happen. exclude_also adds to coverage.py's default patterns, so `# pragma: no cover`
+# keeps working.
+exclude_also = [
+  'pragma:\s*only-on\s+posix\b(?!${OS-})',
+  'pragma:\s*only-on\s+win32\b${OS-}',
+]
+
+# The tables below configure the gates run over this tree before it is published. They are
+# inert for anyone who only runs the tool or its tests. The same gates read the few waivers
+# in the source, comments of the form `# reliability: ignore[...]`, each stating its reason
+# on the line; a gate that needs no setting has no table here.
+
+[tool.pii_scan]
+# The license names its copyright holder, which is its purpose.
+exclude = ["LICENSE"]
+
+[tool.samples_presence]
+# A library, not a tool that turns an input into an output.
+exempt = ["stdio_utf8"]
+
+[tool.stdio_policy]
+# The whole tree, the vendored stdio library included.
+paths = ["."]
+
+[tool.py_version_floor]
+# Every file a stock Mac's 3.9 runs: the entry point, src/, and the suites.
+paths = ["apfs_tm_snapfree.py", "test_apfs_tm_snapfree.py", "src", "tests"]
+
+[tool.dep_audit]
+# Pinning checks only in the inner loop; the network audit is run on demand.
+offline = "skip"
+
+# prose: ignore[claim_check] the table this gate reads, named for it
+[tool.claim_check.bases]
+# The documents here cite paths from this repository's root, the directory every command
+# they print is run from, even when the document itself sits lower: samples/README.md
+# names samples/ files. "." adds this file's own directory as a resolution root for every
+# document under it, so a citation resolves wherever the checker's own root is taken to be.
+"." = ["."]
+
+# prose: ignore[cli_doc_consistency] the table this gate reads, named for it
+[tool.cli_doc_consistency]
+# README.md is the user guide and --help the option reference; no companion doc ships.
+exclude = ["apfs_tm_snapfree.py"]
+
+[tool.context_budget]
+# Budgets the instruction files a coding assistant loads at the start of a session. This
+# repository carries none, so the table declares no subjects: the check then has a
+# declaration to read, and measures nothing.
+
+[tool.prose_terms]
+# Words this project's prose must not use, so they cannot creep back in. They name a
+# standards file, a notes folder and the gate tools this project was developed beside,
+# none of which is in this repository, so a sentence that leans on one explains nothing
+# to its reader: state the rule itself, with a reason anyone can check. Whoever runs the
+# tool is "the operator" or "you"; "owner" is not a term here, because a file's owner is
+# what chown sets, and this tool says so throughout. Code is read as well as prose, so a
+# local that happens to share one of these spellings is waived on its own line, with the
+# reason. Each entry waives itself: the declaration is not prose.
+terms = [
+  # prose: ignore[AGENTS] the declaration itself
+  "AGENTS",
+  # prose: ignore[technical_notes] the declaration itself
+  "technical_notes",
+  # prose: ignore[python_gate] the declaration itself
+  "python_gate",
+  # prose: ignore[check_all] the declaration itself
+  "check_all",
+  # prose: ignore[claim_check] the declaration itself
+  "claim_check",
+  # prose: ignore[cli_doc_consistency] the declaration itself
+  "cli_doc_consistency",
+  # prose: ignore[file_length] the declaration itself
+  "file_length",
+  # prose: ignore[reliability_lint] the declaration itself
+  "reliability_lint",
+  # prose: ignore[pyproject_lint] the declaration itself
+  "pyproject_lint",
+  # prose: ignore[folder_layout] the declaration itself
+  "folder_layout",
+]

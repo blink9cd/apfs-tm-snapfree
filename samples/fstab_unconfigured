@@ -1,0 +1,4 @@
+# A stand-in fstab for the samples. Its one line mounts a volume at a folder that does
+# not exist, so it configures no folder a sample names, and a status run against it
+# stops at its first check. The UUID is an obvious fake, and nothing ever looks it up.
+UUID=00000000-0000-4000-8000-000000000002 /nonexistent/snapfree\040sample apfs rw,nobrowse
