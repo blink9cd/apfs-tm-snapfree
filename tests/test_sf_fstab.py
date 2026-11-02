@@ -319,7 +319,7 @@ class ReplaceFstabTest(_TempCase):
                 ),
             ],
         )
-        self.assertFalse(temp.exists(), "the user temp file is removed afterwards")
+        self.assertFalse(temp.exists(), "the user temp file is removed once used")
         self.assertFalse(sf_fstab.staged_path(self.fstab).exists())
 
     def test_an_absent_fstab_gets_no_backup(self) -> None:

@@ -1,13 +1,13 @@
 [project]
 name = "apfs-tm-snapfree"
-version = "0.1.0"
+version = "0.1.1"
 description = "Move a churning folder onto its own APFS volume, excluded whole from Time Machine"
 readme = "README.md"
 license = "AGPL-3.0-or-later"
 # The oldest runtime this tool supports, and deliberately an old one: a stock Mac's only
 # python3 is the Command Line Tools' 3.9, and this tool must run on a Mac with nothing
-# installed. The tests are standard-library unittest for the same reason, so
-# `python3 -m unittest discover` runs the whole suite there too.
+# installed. The tests are standard-library unittest for the same reason, so the suites
+# run there too, with nothing installed.
 requires-python = ">=3.9"
 # Deliberately empty: standard library only, runtime and tests alike.
 dependencies = []
@@ -66,77 +66,9 @@ exclude_also = [
   'pragma:\s*only-on\s+win32\b${OS-}',
 ]
 
-# The tables below configure the gates run over this tree before it is published. They are
-# inert for anyone who only runs the tool or its tests. The same gates read the few waivers
-# in the source, comments of the form `# reliability: ignore[...]`, each stating its reason
-# on the line; a gate that needs no setting has no table here.
-
-[tool.pii_scan]
-# The license names its copyright holder, which is its purpose.
-exclude = ["LICENSE"]
-
-[tool.samples_presence]
-# A library, not a tool that turns an input into an output.
-exempt = ["stdio_utf8"]
-
-[tool.stdio_policy]
-# The whole tree, the vendored stdio library included.
-paths = ["."]
-
-[tool.py_version_floor]
-# Every file a stock Mac's 3.9 runs: the entry point, src/, and the suites.
-paths = ["apfs_tm_snapfree.py", "test_apfs_tm_snapfree.py", "src", "tests"]
-
-[tool.dep_audit]
-# Pinning checks only in the inner loop; the network audit is run on demand.
-offline = "skip"
-
-# prose: ignore[claim_check] the table this gate reads, named for it
-[tool.claim_check.bases]
-# The documents here cite paths from this repository's root, the directory every command
-# they print is run from, even when the document itself sits lower: samples/README.md
-# names samples/ files. "." adds this file's own directory as a resolution root for every
-# document under it, so a citation resolves wherever the checker's own root is taken to be.
-"." = ["."]
-
-# prose: ignore[cli_doc_consistency] the table this gate reads, named for it
-[tool.cli_doc_consistency]
-# README.md is the user guide and --help the option reference; no companion doc ships.
-exclude = ["apfs_tm_snapfree.py"]
-
-[tool.context_budget]
-# Budgets the instruction files a coding assistant loads at the start of a session. This
-# repository carries none, so the table declares no subjects: the check then has a
-# declaration to read, and measures nothing.
-
-[tool.prose_terms]
-# Words this project's prose must not use, so they cannot creep back in. They name a
-# standards file, a notes folder and the gate tools this project was developed beside,
-# none of which is in this repository, so a sentence that leans on one explains nothing
-# to its reader: state the rule itself, with a reason anyone can check. Whoever runs the
-# tool is "the operator" or "you"; "owner" is not a term here, because a file's owner is
-# what chown sets, and this tool says so throughout. Code is read as well as prose, so a
-# local that happens to share one of these spellings is waived on its own line, with the
-# reason. Each entry waives itself: the declaration is not prose.
-terms = [
-  # prose: ignore[AGENTS] the declaration itself
-  "AGENTS",
-  # prose: ignore[technical_notes] the declaration itself
-  "technical_notes",
-  # prose: ignore[python_gate] the declaration itself
-  "python_gate",
-  # prose: ignore[check_all] the declaration itself
-  "check_all",
-  # prose: ignore[claim_check] the declaration itself
-  "claim_check",
-  # prose: ignore[cli_doc_consistency] the declaration itself
-  "cli_doc_consistency",
-  # prose: ignore[file_length] the declaration itself
-  "file_length",
-  # prose: ignore[reliability_lint] the declaration itself
-  "reliability_lint",
-  # prose: ignore[pyproject_lint] the declaration itself
-  "pyproject_lint",
-  # prose: ignore[folder_layout] the declaration itself
-  "folder_layout",
-]
+# Comments of the form `# reliability: ignore[...]` or `# import-alone: .` in the source
+# are waivers for the lint run over this tree before it is published, and each states its
+# reason on the line. A `# fuzz-target` comment, above two functions in stdio_utf8.py,
+# marks code that reads untrusted input for that run's property-test check; here their
+# suites test them with fixed examples, since Hypothesis is not a dependency. Nothing a
+# user runs reads any of these comments.

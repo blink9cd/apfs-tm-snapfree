@@ -29,7 +29,7 @@ from typing import Callable, Optional, Sequence, TextIO, Union
 # same folder first, and a repeated entry costs nothing.
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
-# The shared UTF-8 stdio policy library, at ONE fixed place: the stdio_utf8/ folder beside
+# The shared UTF-8 stdio policy library, at one fixed place: the stdio_utf8/ folder beside
 # this file. Appended, not inserted, so it can shadow neither src/ nor the standard library.
 # Not a search of the parent directories: with this folder missing, a search would reach
 # past the clone and import whatever folder of that name it found above it; a fixed path
@@ -188,14 +188,18 @@ def _add_arguments(parser: argparse.ArgumentParser) -> None:
     # False unless --warn-percent is on the command line, so a value given to another
     # mode can be refused even though the option always has its default.
     parser.set_defaults(**{_given(_WARN_PERCENT_DEST): False})
+    # The two flags default to None, not False, so --help stamps no default on them,
+    # as it stamps none on --quota or --name; _options_from turns them into bools.
     parser.add_argument(
         "--finish",
         action="store_true",
+        default=None,
         help="resize: delete the volume a previous resize retired.",
     )
     parser.add_argument(
         "--apply",
         action="store_true",
+        default=None,
         help="setup, resize and teardown: perform the steps instead of printing them.",
     )
 
@@ -244,8 +248,8 @@ def _options_from(args: argparse.Namespace) -> Options:
         name=args.name,
         fstab=args.fstab,
         warn_percent=args.warn_percent,
-        finish=args.finish,
-        apply=args.apply,
+        finish=bool(args.finish),
+        apply=bool(args.apply),
     )
 
 

@@ -261,6 +261,20 @@ class HelpFormatterTest(unittest.TestCase):
         # Python before 3.13 stamps one; the suite runs on 3.9 as well, which pins this.
         self.assertEqual(self._help_for(required=True, default="x"), "the x")
 
+    def test_an_unset_flag_is_not_stamped_in_the_tool_s_help(self) -> None:
+        # --finish and --apply are off unless given, as --quota and --name are unset;
+        # none of the four shows a default.
+        text = cli.build_parser().format_help()
+        self.assertNotIn("(default: False)", text)
+        self.assertNotIn("(default: None)", text)
+
+    def test_an_unset_flag_reaches_options_as_false(self) -> None:
+        # The flags default to None so --help stamps nothing; Options still holds a bool.
+        opts = cli.parse_options(["--mode", "status", "--path", os.curdir])
+        assert isinstance(opts, sf_options.Options)
+        self.assertIs(opts.finish, False)
+        self.assertIs(opts.apply, False)
+
 
 class LiveEntryTest(unittest.TestCase):
     def setUp(self) -> None:

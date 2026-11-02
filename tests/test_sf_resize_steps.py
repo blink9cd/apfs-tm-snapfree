@@ -317,7 +317,7 @@ class ResizeConfirmTest(ResizeCase):
 
     def test_the_exclusion_runs_while_the_new_volume_is_mounted_visible(self) -> None:
         # Seen live on macOS 27: addexclusion -v on a nobrowse mount exits 0 and adds
-        # nothing, so it must run before the remount that hides the volume (D8).
+        # nothing, so it must run before the remount that hides the volume.
         out = io.StringIO()
         code = sf_resize.run_resize(self.options(apply=True), self.fake, out)
         self.assertEqual(code, EXIT_OK, out.getvalue())

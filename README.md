@@ -117,7 +117,8 @@ under Q, and fits the container's free space with a 1 GB margin; the aside path
 `P.snapfree-aside-<stamp>` is free (the stamp is the UTC time, `YYYYmmddHHMMSS`); and a
 `.metadata_never_index` at P's top, if there is one, is an empty file (anything else is
 refused, saying it is not the empty file this tool keeps there and to move it aside or rename
-it first). A refusal names its reason and exits `2`. The Full Disk Access check (below) comes last.
+it first). A refusal names its reason and exits `2`. The Full Disk Access check (below)
+comes last.
 
 **Steps, in safe-failure order.** After each step the data is still whole in a known place,
 and the fstab is written only once the volume has been proven to mount.
@@ -142,11 +143,11 @@ and the fstab is written only once the volume has been proven to mount.
 8. `sudo diskutil unmount P && sudo diskutil mount -mountOptions nobrowse -mountPoint P
    <uuid>`: the remount that makes the marker take, since macOS reads it only as a volume
    mounts, and that hides the volume with `nobrowse` from then on. A busy volume is waited
-   out (below). Between the two, refused if P gained entries
-   while the volume was unmounted, as in step 3: the run names them and says to move them into
-   the aside. Confirmed by `st_dev` and the `VolumeUUID` at P. If the step stops once the
-   unmount has taken, the recovery block starts with that mount command, marked
-   `# step 8's command ran`, to put the volume back at P.
+   out (below). Between the two, refused if P gained entries while the volume was unmounted,
+   as in step 3: the run names them and says to move them into the aside. Confirmed by
+   `st_dev` and the `VolumeUUID` at P. If the step stops once the unmount has taken, the
+   recovery block starts with that mount command, marked `# step 8's command ran`, to put
+   the volume back at P.
 9. `sudo mdutil -i off P`, judged by the `mdutil -s` read after it, not by its exit code:
    "disabled" passes even when `-i off` exited non-zero (it exits 1 on a volume the marker has
    already kept out of Spotlight), and "enabled" fails, naming both. Text it cannot read passes
@@ -185,13 +186,14 @@ volume and keeps the old one until you have checked the copy.
 
 **Validation.** The fstab has a line for P, a volume is mounted at P, and it is the one that
 line names; no retired volume is pending; the old volume's `CapacityInUse` plus the 1 GB
-margin fits under Q2 and in the container's free space; and neither the new name nor the
+margin fits under Q2 and in the container's free space; neither the new name nor the
 temporary mount point is taken; and a `.metadata_never_index` at P's root, if there is one,
 is an empty file, since the copy leaves the name out (refused, exit `2`, as in setup). Each
-volume-private name (below) present at P's root must be
-a folder owned by root, the one macOS made; anything else of that name would be left behind by
-the copy, so the run refuses (exit `2`), saying that `P/<name>` is not the macOS-managed folder of
-that name, so the copy would leave it behind, and to move it aside or rename it first. The Full Disk Access check (below) comes last.
+volume-private name (below) present at P's root must be a folder owned by root, the one
+macOS made. Anything else of that name would be left behind by the copy, so the run refuses
+(exit `2`), saying that `P/<name>` is not the macOS-managed folder of that name, that the
+copy would leave it behind, and to move it aside or rename it first. The Full Disk Access
+check (below) comes last.
 
 Before the steps it prints what it will do, says to quit anything that writes to P (what it
 writes once the copy starts stays on the old volume), names the volume-private folders present
@@ -251,8 +253,9 @@ first.
 so validation first proves the data lives elsewhere: the marker exists; the fstab has a line
 for P; the volume mounted at P is the one that line names, and not the retired one; and no
 fstab line, for any mount point, names the retired volume, since the next boot would mount it
-there (remove or change such a line first, with `sudo vifs`). The retired volume must then look like what a resize leaves behind: in the same container as P's volume,
-named from the same stem, with no APFS role, and mounted nowhere. The Full Disk Access check
+there (remove or change such a line first, with `sudo vifs`). The retired volume must then
+look like what a resize leaves behind: in the same container as P's volume, named from the
+same stem, with no APFS role, and mounted nowhere. The Full Disk Access check
 (below) comes last. Its three steps are `sudo diskutil apfs deleteVolume <old>`, confirmed gone
 from `diskutil apfs list`; the marker's removal from the fstab; and a read of Time Machine's
 list of excluded volumes. If the marker cannot be removed after the volume is gone, the
@@ -269,7 +272,8 @@ the retry.
 retired volume is pending (finish the resize first), the data fits the parent container's free
 space with the margin, and the restore folder's name is free. As in resize, each
 volume-private name present at P's root must be the root-owned folder macOS made, and a
-`.metadata_never_index` there must be an empty file, or the run refuses (exit `2`). The Full Disk Access check (below) comes last.
+`.metadata_never_index` there must be an empty file, or the run refuses (exit `2`). The Full
+Disk Access check (below) comes last.
 
 Before the steps it prints what it will move, and says to quit anything that writes to P: what
 it writes once the copy starts stays on the volume, which teardown deletes, along with
@@ -286,16 +290,17 @@ apart: the plain folder teardown leaves has none.
    comparison.
 2. `sudo tmutil removeexclusion -v P`, confirmed by Time Machine's list of excluded volumes
    no longer naming the volume's UUID. `tmutil isexcluded` cannot confirm it: P is still
-   mounted `nobrowse`, which it reports excluded whatever the exclusion. Whether
-   `removeexclusion -v` takes on a `nobrowse` mount is unproven live (`addexclusion -v` does
-   not, see *Time Machine's exclusions* below); if it does not, this confirm fails the step
-   before anything is unmounted, with the data still whole in both places.
+   mounted `nobrowse`, which it reports excluded whatever the exclusion. Unlike
+   `addexclusion -v` (see *Time Machine's exclusions* below), `removeexclusion -v` does take
+   on a `nobrowse` mount: a live run on macOS 27 saw the volume's UUID leave the list. If the
+   confirm ever fails, it fails the step before anything is unmounted, with the data still
+   whole in both places.
 3. `sudo diskutil unmount P`, confirmed by `st_dev`. Just before the command runs, P is
    compared with the copy once more, so nothing written after the copy is hidden by the unmount
    and deleted with the volume: a difference stops the run there, before the unmount, saying
    that something wrote to P after the copy, naming the difference, and saying to quit it, run
-   the recovery commands printed below and teardown again. A
-   busy volume is waited out (below); one still busy after that means something has P open,
+   the recovery commands printed below and teardown again. A busy volume is waited out
+   (below); one still busy after that means something has P open,
    and the error names it where diskutil does, and says that `lsof +D P` lists what.
 4. The unmount uncovers the folder the volume was mounted over. Empty, it is removed; holding
    anything (written while the volume was not mounted), it is moved to
@@ -326,19 +331,28 @@ completed step, most recent first. If the failed step's own command ran but its 
 not see the result (a volume the confirm could not find, say), that step's undo prints first,
 marked `# step N's command ran`, because the command may have changed something. Typical
 lines are `sudo diskutil unmount P`, `rmdir P && mv <aside> P`, `sudo diskutil apfs
-deleteVolume <uuid>` and `sudo cp <fstab>.apfs_tm_snapfree.bak <fstab>`, each with the real
+deleteVolume <uuid>`, and `sudo cp <fstab>.apfs_tm_snapfree.bak <fstab>`, each with the real
 UUIDs and paths learned by then. None is run automatically: a half-finished state is better
 judged by a person than by an undo that guesses at it.
+
+One printed undo needs a step of your own first. Teardown's step 2 undoes as `sudo tmutil
+addexclusion -v P`, which takes only while the volume is mounted visible (see *Time Machine's
+exclusions* below). By the time you reach that line, P is mounted `nobrowse` (every remount
+the recovery prints is), where the command exits 0 and adds nothing. To put the exclusion
+back, remount the volume visible with `sudo diskutil unmount P && sudo diskutil mount
+-mountPoint P <uuid>`, run the printed `addexclusion -v`, and then hide the volume again with
+`sudo diskutil unmount P && sudo diskutil mount -mountOptions nobrowse -mountPoint P <uuid>`.
+Until you do, Time Machine still skips the volume while it is mounted `nobrowse`, but no
+exclusion of its own is on record.
 
 ## What to know before `--apply`
 
 - **Quit whatever writes to the folder first**, in every mode. Every mode confirms its copy by
   comparing a manifest of both sides (paths, kinds, file sizes, link targets), and teardown
-  compares again just before it unmounts. So a
-  write that adds, removes, renames or resizes something fails the check. A write that
-  rewrites a file in place at the same size is not caught, since neither file contents nor
-  modification times are compared, and a write that lands after the copy lands on the side
-  that is about to be retired.
+  compares again just before it unmounts. So a write that adds, removes, renames, or resizes
+  something fails the check. A write that rewrites a file in place at the same size is not
+  caught, since neither file contents nor modification times are compared, and a write that
+  lands after the copy lands on the side that is about to be retired.
 - **Snapshots already taken still pin data until they expire.** Setup stops new snapshots
   covering the folder, but the ones already taken still hold everything the folder held when
   they were taken, and the aside copy, a retired volume and a torn-down volume's data the same
@@ -360,13 +374,12 @@ judged by a person than by an undo that guesses at it.
   Privacy & Security > Full Disk Access, after which the app must be quit and reopened. A dry
   run prints the same as a warning and still lists its steps. With no such file (Time
   Machine never set up) the check cannot tell, and the run goes on. A command whose error
-  reads "Operation not permitted" still
-  gets a second line naming the likely cause. The tool never changes privacy settings.
+  reads "Operation not permitted" still gets a second line naming the likely cause. The tool
+  never changes privacy settings.
 - **Time Machine's exclusions.** Time Machine treats a volume mounted `nobrowse`, as every
   volume this tool mounts is once its first mount is over, as excluded whether or not
   anything excluded it, and `tmutil isexcluded` reports that. So the steps that add or remove
-  an exclusion are confirmed by
-  Time Machine's own list instead, `ExcludedVolumeUUIDs` in
+  an exclusion are confirmed by Time Machine's own list instead, `ExcludedVolumeUUIDs` in
   `/Library/Preferences/com.apple.TimeMachine.plist`, read with `sudo /usr/bin/plutil -extract
   ExcludedVolumeUUIDs xml1 -o - <that file>` and compared ignoring case. No key, or no file,
   reads as an empty list; any other failure fails the step. tmutil's change can reach the file
@@ -374,10 +387,9 @@ judged by a person than by an undo that guesses at it.
   seconds, stopping at the first read that does; the step fails only after the last. The tool
   only ever reads the file. That list also showed, live on macOS 27, that `tmutil
   addexclusion -v` on a `nobrowse` mount exits 0 and adds nothing to it, so setup and resize
-  exclude a new volume while its first mount is still visible. No recovery removes an exclusion setup or resize added: every undo
-  after it ends in deleting the volume, and a deleted volume's UUID left in the list is
-  harmless, as `resize --finish` notes; a `removeexclusion -v` printed then could also be a
-  no-op, the volume being mounted `nobrowse` by that point.
+  exclude a new volume while its first mount is still visible. No recovery removes an
+  exclusion setup or resize added: every undo after it ends in deleting the volume, and a
+  deleted volume's UUID left in the list is harmless, as `resize --finish` notes.
 - **Every mount but a new volume's first is `nobrowse`.** Each `diskutil mount` the tool runs
   or prints, recovery lines included, passes `-mountOptions nobrowse`, so the volume does not
   show in Finder and is not browsed by Spotlight, except a new volume's first mount (setup's
@@ -393,21 +405,19 @@ judged by a person than by an undo that guesses at it.
   volume again, and only then run `mdutil -i off`, which on such a volume exits 1, printing a
   "disabling Spotlight ... -> kMDConfigSearchLevelFSSearchOnly" log line, while `mdutil -s`
   reads disabled: so the read, not the exit code, is the step's verdict. The marker stays at
-  the root for good; it is
-  the tool's own, so no copy carries it and no comparison counts it, and resize gives the new
-  volume its own rather than copying the old one's.
+  the root for good; it is the tool's own, so no copy carries it and no comparison counts it,
+  and resize gives the new volume its own rather than copying the old one's.
 - **A busy unmount is waited out, never forced.** Spotlight's `mds` can hold a volume the
   tool has just made, even after `mdutil -i off`, and diskutil then refuses to unmount it,
   "dissented by" mds; it was seen only on a mount that was not `nobrowse`, which a new
   volume's first mount now is, and that is the mount the remounts unmount. So when an
   unmount (the remounts, setup's step 8 and resize's step 9; resize's steps 12 and 14;
-  teardown's step 3) is refused
-  with text saying it was dissented or the resource was busy, the tool reads whether the
-  folder is still mounted, waits 1, 2, 4, 8 and then 16 seconds between tries, about half
-  a minute in all, and stops as soon as the folder is unmounted. Any other refusal fails at
-  once. Still busy after the last try, the step fails as any other does, naming the process
-  diskutil named, and says to wait for it to let go or quit it before running the printed
-  recovery. `diskutil unmount force` is never run for you.
+  teardown's step 3) is refused with text saying it was dissented or the resource was busy,
+  the tool reads whether the folder is still mounted, waits 1, 2, 4, 8, and then 16 seconds
+  between tries, about half a minute in all, and stops as soon as the folder is unmounted.
+  Any other refusal fails at once. Still busy after the last try, the step fails as any other
+  does, naming the process diskutil named, and says to wait for it to let go or quit it before
+  running the printed recovery. `diskutil unmount force` is never run for you.
 - **The volume's own entries.** A mounted volume's root holds `.fseventsd`, `.Spotlight-V100`,
   `.Trashes`, `.TemporaryItems` and `.DocumentRevisions-V100`, which macOS keeps for the volume
   itself: root-only, and churning. Resize and teardown leave them out, at the volume root's top
@@ -423,8 +433,8 @@ judged by a person than by an undo that guesses at it.
 ## Trying it on a throwaway folder
 
 A first run is best made on a folder you can lose. It changes the real `/etc/fstab` (the
-previous one is kept as `/etc/fstab.apfs_tm_snapfree.bak`) and makes a small volume, both
-undone by the teardown at the end.
+previous one is kept as `/etc/fstab.apfs_tm_snapfree.bak`) and makes a small volume, then
+resizes it, and the teardown at the end undoes both.
 
 ```bash
 mkdir "$HOME/snapfree-trial"
@@ -436,7 +446,31 @@ python3 apfs_tm_snapfree.py --mode status --path "$HOME/snapfree-trial"
 
 The first `setup` prints its twelve steps and changes nothing; the second performs them, asking
 for your password once for sudo; `status` should print eight `ok` lines and exit `0`.
-Restart, and run `status` again to see the fstab line mount the volume at boot. Then undo it:
+Restart, and run `status` again to see the fstab line mount the volume at boot.
+
+Then give the volume a larger quota, check that the data came across, and delete the old
+volume the resize keeps:
+
+```bash
+python3 apfs_tm_snapfree.py --mode resize --path "$HOME/snapfree-trial" --quota 3g
+python3 apfs_tm_snapfree.py --mode resize --path "$HOME/snapfree-trial" --quota 3g --apply
+python3 apfs_tm_snapfree.py --mode status --path "$HOME/snapfree-trial"
+cat "$HOME/snapfree-trial/note.txt"
+python3 apfs_tm_snapfree.py --mode resize --path "$HOME/snapfree-trial" --finish --apply
+python3 apfs_tm_snapfree.py --mode status --path "$HOME/snapfree-trial"
+```
+
+The first `resize` prints its seventeen steps and changes nothing; the second performs them
+and keeps the old volume, its data intact. The `status` after it prints seven `ok` lines and
+a last one, `WARN retired volume pending`, naming the `--finish` command, and exits `1`.
+`cat` should print `hello`, read from the new volume, before anything is deleted. `--finish`
+performs its three steps and deletes the old volume, and the last `status` prints eight `ok`
+lines again. Run `--finish` before
+you next restart: the old volume has no fstab line, so a restart may mount it under
+`/Volumes`, and `--finish` then refuses until it is unmounted (see
+[Resize](#resize---mode-resize---path-p---quota-q2)).
+
+Then undo it all:
 
 ```bash
 python3 apfs_tm_snapfree.py --mode teardown --path "$HOME/snapfree-trial" --apply
@@ -447,20 +481,25 @@ beside the folder; run it once you are satisfied, then delete the trial folder.
 
 ## Running the tests
 
-The suite is standard-library `unittest` and runs on Python 3.9, the `python3` of a stock
-Mac, with nothing installed:
+The suites are standard-library `unittest` and run on Python 3.9, the `python3` of a stock
+Mac, with nothing installed. There are two, and each needs its own command:
 
 ```bash
 python3 -m unittest discover
+python3 stdio_utf8/test_stdio_utf8.py
 ```
+
+The first runs the tool's suites. `discover` walks only folders that are Python packages, and
+`stdio_utf8/` is not one, so the library's suite runs from its own entry point, the second
+command.
 
 Every host command goes through one seam, `sf_host.Host`, and so do the Full Disk Access
 probe, the environment it names the app from, and the waits between unmount retries. The
-suites replace it with a scripted fake (`tests/fake_host.py`), so no test reaches a disk, a volume, a system setting
-or `sudo`. The one live test class runs the entry point as a child process for `--help`
-and for `status` against a temporary fstab with no line for the folder, both of which end
-before any host command. No test performs `--apply` on a real volume: that proof is a real
-run on a throwaway folder, as above.
+suites replace it with a scripted fake (`tests/fake_host.py`), so no test reaches a disk, a
+volume, a system setting, or `sudo`. The one live test class runs the entry point as a child
+process for `--help` and for `status` against a temporary fstab with no line for the folder,
+both of which end before any host command. No test performs `--apply` on a real volume: that
+proof is a real run on a throwaway folder, as above.
 
 ## Layout
 
@@ -469,8 +508,8 @@ run on a throwaway folder, as above.
 | `apfs_tm_snapfree.py` | the entry point: options, the mode table, exit codes |
 | `src/` | one module per concern, each named `sf_*`: the host seam, the fstab, the macOS readers, the plan runner, and one module per mode |
 | `tests/` | the suites, one per module, and the scripted host they share |
-| `test_apfs_tm_snapfree.py` | runs every suite, and checks that each one was found |
-| `stdio_utf8/` | a small library that keeps the tool's output UTF-8 whatever the locale says |
+| `test_apfs_tm_snapfree.py` | runs every suite under `tests/`, and checks that each one was found |
+| `stdio_utf8/` | a small library that keeps the tool's output UTF-8 whatever the locale says, with its own suite |
 | `samples/` | read-only runs to check by hand, with their expected output |
 
 ## License

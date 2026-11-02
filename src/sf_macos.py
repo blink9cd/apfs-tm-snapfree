@@ -13,7 +13,7 @@ mounted. Time Machine's own list of explicitly excluded volumes, ``ExcludedVolum
 in its preferences file, can: ``excluded_volume_uuids`` reads it with ``plutil``, under
 sudo, and never writes it. That list also showed, live on macOS 27, that
 ``addexclusion -v`` on a nobrowse mount exits 0 and adds nothing, which is why setup and
-resize exclude a new volume while its first mount is still visible (ruling D8).
+resize exclude a new volume while its first mount is still visible.
 
 ``diskutil info`` takes a device, a volume UUID or a mount point, and exits 1 ("Could
 not find disk") for a folder inside a volume, so a path is never handed to it: the

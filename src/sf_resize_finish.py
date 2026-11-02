@@ -11,8 +11,8 @@ A resize leaves both volumes in Time Machine's ``ExcludedVolumeUUIDs``, and once
 retired one is deleted no ``tmutil`` command can unlist it: ``removeexclusion -v`` needs
 the volume mounted. So the last step only reads that list, after the delete and the
 marker, and if it still names the deleted volume says the entry is harmless and where
-the owner can review exclusions. The tool never edits Time Machine's preferences
-behind tmutil's back, so the entry is left for the owner.
+the operator can review exclusions. The tool never edits Time Machine's preferences
+behind tmutil's back, so the entry is left for the operator.
 
 Deleting a volume has no undo, so validation first proves the data lives elsewhere:
 the folder's fstab line names a volume, that volume is the one mounted there, and it

@@ -89,7 +89,7 @@ class MountArgvTest(unittest.TestCase):
                          "-mountPoint /w U")  # fmt: skip
 
     def test_a_first_mount_may_be_visible(self) -> None:
-        # Ruling D8: tmutil addexclusion -v is a silent no-op on a nobrowse mount, so
+        # tmutil addexclusion -v is a silent no-op on a nobrowse mount, so
         # a new volume's first mount is visible, for the exclusion to take.
         argv = sf_unmount.mount_argv(Path("/w"), "U", visible=True)
         self.assertEqual(render(argv), "sudo diskutil mount -mountPoint /w U")

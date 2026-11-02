@@ -201,7 +201,7 @@ def _mode_text(mode: int) -> str:
 def _put_back(facts: SetupFacts) -> str:
     """The command that undoes the rename aside, whether or not the folder came back.
 
-    A bare ``mv`` onto a recreated folder would move the aside INTO it, hiding the
+    A bare ``mv`` onto a recreated folder would move the aside into it, hiding the
     original one level down; ``rmdir`` first removes the empty recreation, and on a
     missing folder it fails before ``mv`` runs, so one form serves both cases.
     """
@@ -267,7 +267,8 @@ def _require_still_empty(facts: SetupFacts) -> None:
 def _mount_step(host: Host, facts: SetupFacts, uuid: Slot) -> Step:
     """Step 3: mount the new volume at the folder, visible; confirm it is that volume.
 
-    Visible so that step 6's exclusion takes (ruling D8); step 8 remounts it nobrowse.
+    Visible so that step 6's exclusion takes, which it does not on a nobrowse mount;
+    step 8 remounts it nobrowse.
     """
 
     def mounted() -> None:
@@ -338,7 +339,7 @@ def _exclusion_step(host: Host, facts: SetupFacts, uuid: Slot) -> Step:
     """Step 6: exclude the whole volume from Time Machine; confirm the exclusion.
 
     It runs while step 3's mount is still visible: on a nobrowse mount
-    ``addexclusion -v`` exits 0 and lists nothing (ruling D8). Confirmed by Time
+    ``addexclusion -v`` exits 0 and lists nothing. Confirmed by Time
     Machine's own list of excluded volumes, never ``isexcluded``, which reports any
     nobrowse volume excluded, so it would pass once the volume is hidden whatever
     this did. No recovery of its own: every undo ends in deleting the volume, and a
@@ -457,7 +458,7 @@ def plan(opts: Options, host: Host, facts: SetupFacts, out: TextIO) -> list[Step
         _mount_step(host, facts, uuid),
         _ownership_step(host, facts),
         _owner_step(host, facts),
-        # While the first mount is visible, so the exclusion takes (ruling D8).
+        # While the first mount is visible, so the exclusion takes.
         _exclusion_step(host, facts, uuid),
         sf_spotlight.marker_step(facts.path),
         sf_spotlight.remount_step(

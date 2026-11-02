@@ -3,9 +3,9 @@
 diskutil has no verb that changes an APFS volume's quota, so a resize is a new volume.
 It is added beside the old one in the same container, mounted at a hidden temporary
 mount point beside the folder (visible this once, so that its Time Machine exclusion
-takes: ruling D8), given the folder's owner and mode and the exclusion, its own
-Spotlight marker (and mounted again there, nobrowse, so the marker takes), Spotlight
-off, and filled with a copy of the data, the old marker left out. Then the old volume is
+takes), given the folder's owner and mode and the exclusion, its own Spotlight marker
+(and mounted again there, nobrowse, so the marker takes), Spotlight off, and filled
+with a copy of the data, the old marker left out. Then the old volume is
 unmounted from the folder, the new one mounted there, and the fstab line switched to
 the new UUID with a marker comment recording the old one.
 
@@ -233,7 +233,8 @@ def _mount_step(
 ) -> Step:
     """Mount the new volume at *where*, confirmed by the UUID diskutil then reports.
 
-    *visible* is for the first mount at the temporary mount point only (ruling D8).
+    *visible* is for the first mount at the temporary mount point only, so that the
+    Time Machine exclusion after it takes.
     """
 
     def mounted() -> None:
@@ -279,7 +280,8 @@ def _unmount_temp_line(host: Host, temp: Path) -> Optional[str]:
 def _new_volume_steps(job: ResizeJob, host: Host, uuid: Slot) -> list[Step]:
     """Add the volume, make the temporary mount point, and mount the volume on it.
 
-    That first mount is visible, so the exclusion after it takes (ruling D8).
+    That first mount is visible, so the exclusion after it takes: on a nobrowse mount
+    ``addexclusion -v`` adds nothing.
     """
     temp = job.temp
     return [
@@ -317,7 +319,7 @@ def _settings_steps(job: ResizeJob, host: Host, uuid: Slot) -> list[Step]:
     """Give the new volume the folder's owner and mode, and keep it out of indexes.
 
     The Time Machine exclusion runs while the first mount is still visible, since on
-    a nobrowse mount ``addexclusion -v`` lists nothing (ruling D8). The Spotlight
+    a nobrowse mount ``addexclusion -v`` lists nothing. The Spotlight
     marker goes on once the user owns the root, and the remount after it, nobrowse
     from then on, is what makes it take, before ``mdutil -i off``.
     """

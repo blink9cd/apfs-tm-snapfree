@@ -6,7 +6,7 @@ kept from Finder and Spotlight. diskutil applies a matching fstab line's options
 even without them, but setup's volume has no fstab line until late in its run, and
 resize's temporary mount never does.
 
-The one visible mount is a new volume's first (ruling D8): ``tmutil addexclusion -v``
+The one visible mount is a new volume's first, because ``tmutil addexclusion -v``
 exits 0 on a nobrowse mount and adds nothing to Time Machine's list, so setup and
 resize exclude the volume while it is visible, then remount it nobrowse for good.
 

@@ -185,7 +185,7 @@ class ResizeCase(unittest.TestCase):
         ]
 
     def visible_mount_argv(self, where: Path, uuid: str) -> list[str]:
-        """``sudo diskutil mount -mountPoint <where> <uuid>``: the first mount (D8)."""
+        """``sudo diskutil mount -mountPoint <where> <uuid>``: the first, visible mount."""
         return ["sudo", "diskutil", "mount", "-mountPoint", str(where), uuid]
 
     def mount_argv(self, where: Path, uuid: str) -> list[str]:

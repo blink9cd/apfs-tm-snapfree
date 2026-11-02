@@ -52,7 +52,8 @@ class ApplyFixture(SetupFixture):
                 "40g",
                 "-nomount",
             ),  # fmt: skip
-            # The first mount is visible, so addexclusion -v takes (ruling D8).
+            # The first mount is visible, so addexclusion -v takes (on a nobrowse
+            # mount it adds nothing).
             "mount": (
                 "sudo",
                 "diskutil",

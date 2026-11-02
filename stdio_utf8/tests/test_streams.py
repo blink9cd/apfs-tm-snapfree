@@ -1,4 +1,4 @@
-"""Grouped suite: the stream policy itself -- forcing a tool's own streams to UTF-8, and
+"""Grouped suite: the stream policy itself, forcing a tool's own streams to UTF-8, and
 the constants that decode a child's capture.
 """
 
@@ -59,7 +59,7 @@ class TestForceUtf8Streams(unittest.TestCase):
         self.assertEqual(buffer.getvalue().decode("utf-8"), "arrow → name")
 
     def test_skips_stream_without_reconfigure(self) -> None:
-        """io.StringIO -- what tests substitute for stdout -- is skipped, not an error."""
+        """io.StringIO, what tests substitute for stdout, is skipped, not an error."""
         self.assertEqual(stdio_utf8.force_utf8_streams(io.StringIO()), ())
 
     def test_skips_closed_stream(self) -> None:
@@ -82,8 +82,9 @@ class TestForceUtf8Streams(unittest.TestCase):
     def test_takes_its_streams_positionally_only(self) -> None:
         """A keyword stream is refused, as it always was when every stream was variadic.
 
-        One calling convention keeps the stdio_policy gate honest: it counts a call's
-        positional arguments, so a keyword spelling it cannot see must not work either.
+        One calling convention keeps a static check of the call honest: such a check counts
+        a call's positional arguments, so a keyword spelling it cannot see must not work
+        either.
         """
         _, stream = _cp1252_stream()
         with self.assertRaises(TypeError):

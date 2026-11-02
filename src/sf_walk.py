@@ -35,7 +35,7 @@ from sf_errors import ToolError
 #: The entries macOS creates at the top of a mounted volume for the volume's own use.
 #: Each is root-only (the user cannot list it) and none is the operator's data, so a
 #: copy of a volume's data, and the count confirming it, skip them. They are skipped
-#: ONLY at a volume root's top level: the same name deeper down is ordinary data.
+#: only at a volume root's top level: the same name deeper down is ordinary data.
 VOLUME_PRIVATE = frozenset(
     {
         # The FSEvents journal of changes on this volume; rewritten continually.

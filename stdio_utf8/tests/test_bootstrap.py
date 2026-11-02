@@ -1,6 +1,6 @@
 """Grouped suite: this project's sys.path bootstrap never reaches above its own root.
 
-The entry point puts this library on ``sys.path`` from ONE fixed place: the
+The entry point puts this library on ``sys.path`` from one fixed place: the
 ``stdio_utf8/`` folder beside it at the project root, derived from its own ``__file__``
 and appended. Nothing here searches the ancestors, so no folder above a checkout can be
 imported in place of the real one, and a missing copy fails at the import. The entry
@@ -80,7 +80,7 @@ class TestBootstrapStaysInsideTheProject(unittest.TestCase):
 
     The entry point puts this library on sys.path at one fixed place: the stdio_utf8/
     folder beside it. A search of its ancestors instead would also take a same-named
-    folder planted ABOVE the checkout -- a shared temporary directory, say -- and would
+    folder planted above the checkout (a shared temporary directory, say), and would
     take it outright when the project's own copy is missing. These copy the project
     under a parent holding exactly such a folder and run the entry point in a real
     subprocess; the planted modules record that they ran.
