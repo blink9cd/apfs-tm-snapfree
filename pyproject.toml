@@ -1,6 +1,6 @@
 [project]
 name = "apfs-tm-snapfree"
-version = "0.1.1"
+version = "0.1.2"
 description = "Move a churning folder onto its own APFS volume, excluded whole from Time Machine"
 readme = "README.md"
 license = "AGPL-3.0-or-later"

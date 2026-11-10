@@ -2,11 +2,12 @@
   "files": {
     ".gitattributes": "sha256:2cb36a6ac2b663f9a36620b7794415df4dfc8ce4391c20fd48893019844e216c",
     ".gitignore": "sha256:d886a4717ae1eb57c07ddf0a8ddd6fa186dcd1b9e7cf5647acfb296f014b5e58",
-    "CHANGELOG.md": "sha256:abc1c1ca215e2b61992170e941ca0f2a1d0d56df2b56e311e7824fb28f461a75",
-    "LICENSE": "sha256:480bc086cc31abd0ec8598db97abf2a5490bf30613bc209342a4e2c71a0f8b87",
+    "CHANGELOG.md": "sha256:c221cc9fe4e0f8dbfc5b8a74c5d51e776aeaa9b7c83021aff367be574a175ff1",
+    "LICENSE": "sha256:57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+    "NOTICE": "sha256:327ceae4f0e5a0b8baa3c5cef657cc5bf1ed0d00964e056974dd774243224489",
     "README.md": "sha256:c69f33beb6138a2ec6f268157aa78c22282372bed96dc6e96e96f2cf36f8b7d6",
     "apfs_tm_snapfree.py": "sha256:97fc57a2d835a18751236039cb6e4d7dd4cc3ca08e32988e2f6b1d1c2d330064",
-    "pyproject.toml": "sha256:606ea6a141ef0edf41e527a1ae1dccfdc560484304c5c4db608979b973a1faa4",
+    "pyproject.toml": "sha256:bc2b0fe786f5ccd3a5a5ca4fc8e3b20a2bd1e8a79cca6a216878942c6ec7e1e3",
     "samples/README.md": "sha256:2025a9f5aee7650e882c6ce518b44b9e5f0d515e9bc67f9a6bda5b5fe1735275",
     "samples/expected_unconfigured.txt": "sha256:8b2e5db3b8a7229ec2349f0b592e99b90ed776f877ea9052ca0f5db21ee2ce80",
     "samples/expected_unmounted.txt": "sha256:02b2e9253ad8c20ae7c7ca5349506624a455daf450bbbdfbb15a4443b4ebf33e",
@@ -73,6 +74,6 @@
   },
   "name": "apfs-tm-snapfree",
   "schema": 1,
-  "source_commit": "daae2208d560b950347288aba8070bf9b91b8922",
-  "version": "0.1.1"
+  "source_commit": "9afc032130366c58dfaa87269ce45983b633921e",
+  "version": "0.1.2"
 }
