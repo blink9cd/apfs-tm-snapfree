@@ -335,15 +335,14 @@ deleteVolume <uuid>`, and `sudo cp <fstab>.apfs_tm_snapfree.bak <fstab>`, each w
 UUIDs and paths learned by then. None is run automatically: a half-finished state is better
 judged by a person than by an undo that guesses at it.
 
-One printed undo needs a step of your own first. Teardown's step 2 undoes as `sudo tmutil
-addexclusion -v P`, which takes only while the volume is mounted visible (see *Time Machine's
-exclusions* below). By the time you reach that line, P is mounted `nobrowse` (every remount
-the recovery prints is), where the command exits 0 and adds nothing. To put the exclusion
-back, remount the volume visible with `sudo diskutil unmount P && sudo diskutil mount
--mountPoint P <uuid>`, run the printed `addexclusion -v`, and then hide the volume again with
-`sudo diskutil unmount P && sudo diskutil mount -mountOptions nobrowse -mountPoint P <uuid>`.
-Until you do, Time Machine still skips the volume while it is mounted `nobrowse`, but no
-exclusion of its own is on record.
+Teardown's step 2, which removes the volume's Time Machine exclusion, prints a comment
+instead of an undo. Until step 6 removes P's fstab line, diskutil applies that line's
+`nobrowse` to a mount of the volume even when it is given no `-mountOptions`, so no mount
+this tool prints is visible; and `sudo tmutil addexclusion -v P` exits 0 and adds nothing on a
+`nobrowse` mount (see *Time Machine's exclusions* below). Nothing is lost meanwhile: Time
+Machine skips a volume mounted `nobrowse` whether or not it has an exclusion of its own.
+`status` reads it excluded either way, since `isexcluded` reports every `nobrowse` volume
+excluded, so it cannot tell you whether the exclusion of its own is still on record.
 
 ## What to know before `--apply`
 

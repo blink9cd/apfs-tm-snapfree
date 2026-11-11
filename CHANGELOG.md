@@ -2,6 +2,24 @@
 
 Notable changes to this project, newest first.
 
+## 0.1.3 - 2026-11-11
+
+### Fixed
+
+- When a teardown fails at any of its steps 2 to 6, the recovery it prints no longer
+  offers `sudo tmutil addexclusion -v <folder>` as that step's undo. The command did
+  nothing: until the folder's fstab line is removed, diskutil mounts the volume
+  `nobrowse` even when asked for no options, and the command adds nothing there. A
+  comment now explains that the step needs no undo, because Time Machine skips a
+  `nobrowse` volume either way. The README no longer suggests a manual remount, which did
+  not work for the same reason.
+- A folder whose name holds unusual characters can no longer turn part of a printed
+  recovery block into a command. A newline in the name could break a recovery comment
+  into a second line, which pasting the block into a shell would have run. Control
+  characters in those lines now print escaped, as `\x0a` for a newline, and the two
+  recovery lines that are notes rather than commands (one when a recovery cannot be
+  worked out, and `resize --finish`'s hand-edit line) are now `#` comments too.
+
 ## 0.1.2 - 2026-11-10
 
 ### Changed

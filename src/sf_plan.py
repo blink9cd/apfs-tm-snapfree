@@ -139,6 +139,25 @@ def render(argv: Sequence[Arg]) -> str:
     return " ".join(_render_item(item) for item in argv)
 
 
+#: The highest C0 control character, and DEL: each ends or corrupts a printed line.
+_LAST_C0 = 0x1F
+_DEL = 0x7F
+
+
+def comment_text(value: object) -> str:
+    r"""*value* as text safe inside a printed ``#`` recovery comment.
+
+    A shell comment ends at a newline whatever quoting surrounds it, so a folder named
+    with one would turn the rest of the comment into a command a pasted recovery block
+    runs as root. Every control character is shown as ``\xNN`` instead; spaces and
+    quotes, which a comment needs no protection from, are left as they are.
+    """
+    return "".join(
+        f"\\x{ord(char):02x}" if ord(char) <= _LAST_C0 or ord(char) == _DEL else char
+        for char in str(value)
+    )
+
+
 def resolve(argv: Sequence[Arg]) -> list[str]:
     """*argv* with every slot read; an unset one is a ``ToolError``."""
     return [item.get() if isinstance(item, Slot) else item for item in argv]
@@ -195,7 +214,8 @@ def _call_recover(recover: Callable[[], Optional[str]]) -> Optional[str]:
     try:
         return recover()
     except (ToolError, OSError) as exc:
-        return f"(a recovery command could not be worked out: {exc})"
+        # A comment, so a pasted block runs none of the error text, which may hold a path.
+        return f"# a recovery command could not be worked out: {comment_text(exc)}"
 
 
 def command_step(

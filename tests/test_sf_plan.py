@@ -324,7 +324,7 @@ class StepRenderingTest(unittest.TestCase):
         step = sf_plan.Step("x", _noop, lambda: f"undo {unset.get()}")
         line = step.recovery_line()
         assert line is not None
-        self.assertIn("could not be worked out", line)
+        self.assertTrue(line.startswith("# a recovery command could not be worked out"))
         self.assertIn("<u>", line)
 
     def test_a_callable_recover_that_cannot_read_the_disk_never_breaks_the_line(
@@ -335,8 +335,18 @@ class StepRenderingTest(unittest.TestCase):
 
         line = sf_plan.Step("x", _noop, unreadable).recovery_line()
         assert line is not None
-        self.assertIn("could not be worked out", line)
+        self.assertTrue(line.startswith("# a recovery command could not be worked out"))
         self.assertIn("No such file or directory", line)
+
+    def test_a_path_in_the_failure_note_cannot_end_its_line(self) -> None:
+        # An OSError shows its filename by repr, already escaped; a ToolError does not.
+        def unreadable() -> str:
+            raise ToolError("cannot read /w\nrm -rf /y")
+
+        line = sf_plan.Step("x", _noop, unreadable).recovery_line()
+        assert line is not None
+        self.assertNotIn("\n", line)
+        self.assertTrue(line.startswith("# a recovery command could not be worked out"))
 
 
 class SlotPlanTest(unittest.TestCase):
@@ -425,6 +435,25 @@ class SlotPlanTest(unittest.TestCase):
 def _raise_tool_error() -> None:
     """A step action that fails."""
     raise ToolError("it failed")
+
+
+class CommentTextTest(unittest.TestCase):
+    """A value printed inside a ``#`` recovery comment can never end the comment."""
+
+    def test_a_newline_is_escaped_so_the_comment_stays_one_line(self) -> None:
+        text = sf_plan.comment_text(Path("/Volumes/x\nrm -rf /tmp/y ;"))
+        self.assertEqual(text, "/Volumes/x\\x0arm -rf /tmp/y ;")
+        self.assertNotIn("\n", text)
+
+    def test_every_control_character_is_escaped(self) -> None:
+        self.assertEqual(
+            sf_plan.comment_text("a\rb\tc\x7fd\x00"), "a\\x0db\\x09c\\x7fd\\x00"
+        )
+
+    def test_plain_text_is_unchanged_spaces_and_quotes_included(self) -> None:
+        self.assertEqual(
+            sf_plan.comment_text("/Volumes/it's here"), "/Volumes/it's here"
+        )
 
 
 if __name__ == "__main__":

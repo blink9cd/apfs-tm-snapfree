@@ -26,6 +26,7 @@ from tests.test_sf_teardown import (
     OTHER_LINE,
     VOLUME_UUID,
     TeardownFixture,
+    step_2_undo_line,
 )
 
 _DELETE = ("sudo", "diskutil", "apfs", "deleteVolume", VOLUME_UUID)
@@ -176,7 +177,7 @@ class AppliedRunTest(TeardownFixture):
         self.assertEqual(
             recovery_lines(text),
             [
-                f"sudo tmutil addexclusion -v {self.folder}",
+                step_2_undo_line(self.folder),
                 f"# the restore copy at {self.restore} can be removed once "
                 f"{self.folder} is checked",
             ],
@@ -269,7 +270,7 @@ class InjectedFailureTest(TeardownFixture):
         folder, restore = self.folder, self.restore
         return [
             f"# the restore copy at {restore} can be removed once {folder} is checked",
-            f"sudo tmutil addexclusion -v {folder}",
+            step_2_undo_line(folder),
             f"sudo diskutil mount -mountOptions nobrowse -mountPoint {folder} {VOLUME_UUID}",
             f"mkdir {folder}",
             f"mv {folder} {restore}",

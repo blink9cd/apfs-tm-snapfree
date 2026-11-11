@@ -237,7 +237,7 @@ class FinishRunTest(FinishCase):
         code, text = self._run(apply=True)
         self.assertEqual(code, EXIT_FAIL)
         self.assertIn("FAILED at step 2:", text)
-        self.assertIn(f"remove the marker retiring {OLD} from {self.fstab}", text)
+        self.assertIn(f"\n  # remove the marker retiring {OLD} from {self.fstab}", text)
 
     def test_a_marker_still_present_after_the_rewrite(self) -> None:
         self.ignore(["sudo", "mv", "-f"], prefix=True)

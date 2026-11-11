@@ -47,7 +47,7 @@ from sf_fstab import (
 from sf_fstab_steps import fstab_step
 from sf_host import COMMAND_TIMEOUT, Host, format_argv, run_checked
 from sf_options import Options, volume_name_stem
-from sf_plan import Step, render, run_plan
+from sf_plan import Step, comment_text, render, run_plan
 
 #: Printed by the last step when Time Machine still lists the deleted volume.
 _STALE_EXCLUSION = (
@@ -222,8 +222,9 @@ def plan_finish(job: FinishJob, host: Host, out: TextIO) -> list[Step]:
             )
 
     what = f"remove the marker retiring {job.retired}"
-    hand_edit = (
-        f"{what} from {job.fstab} by hand (sudo vifs): the volume itself is deleted"
+    # A comment, so pasting the recovery block runs nothing of the path it names.
+    hand_edit = comment_text(
+        f"# {what} from {job.fstab} by hand (sudo vifs): the volume itself is deleted"
     )
     argv = ["sudo", "diskutil", "apfs", "deleteVolume", job.retired]
 

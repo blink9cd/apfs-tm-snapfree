@@ -8,6 +8,7 @@ fixture defined here.
 """
 
 import contextlib
+import dataclasses
 import functools
 import io
 import os
@@ -43,6 +44,20 @@ PARENT_DEVICE = fake_host.FAKE_DEVICE
 #: What the fake fstab holds besides teardown's line, which must survive the rewrite.
 FSTAB_HEADER = "# a comment that stays\n"
 OTHER_LINE = "UUID=00000000-0000-4000-8000-000000000009 /elsewhere apfs rw,nobrowse\n"
+
+
+def step_2_undo_line(folder: Path) -> str:
+    """Step 2's recovery line: a comment, since no command can undo it while it matters.
+
+    While the folder's fstab line exists, every mount of the volume is nobrowse, which
+    Time Machine skips with or without an exclusion, and on which ``addexclusion -v``
+    adds nothing; so the line explains instead of printing a command that does nothing.
+    """
+    return (
+        f"# step 2 needs no undo: while the fstab line mounts {folder} nobrowse, Time "
+        "Machine skips the volume without an exclusion of its own, and addexclusion -v "
+        "adds nothing on a nobrowse mount"
+    )
 
 
 class TeardownFixture(unittest.TestCase):
@@ -360,6 +375,24 @@ class PlainFolderConfirmTest(TeardownFixture):
     def test_an_unmounted_folder_is(self) -> None:
         self.fake.unmount(self.folder)
         sf_teardown.confirm_plain_folder(self.fake, self.folder)
+
+
+class CommentRecoveryTest(TeardownFixture):
+    """A folder named with a newline cannot break a recovery comment into a command."""
+
+    def test_each_comment_recovery_stays_one_line(self) -> None:
+        plan = sf_teardown.validate(self.opts(), self.fake)
+        odd = self.tmp / "x\nrm -rf /tmp/y ;"
+        plan = dataclasses.replace(plan, path=odd, restore=self.tmp / ".r\nid")
+        steps = sf_teardown.build_steps(self.fake, plan, io.StringIO())
+        comments = [
+            line
+            for line in (step.recovery_line() for step in steps)
+            if line is not None and line.startswith("#")
+        ]
+        self.assertEqual(len(comments), 2)
+        for line in comments:
+            self.assertNotIn("\n", line)
 
 
 class DispatchTest(TeardownFixture):

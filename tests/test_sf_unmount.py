@@ -23,7 +23,7 @@ from sf_host import COMMAND_TIMEOUT, RunResult
 from sf_plan import Slot, render, run_plan
 from tests import fake_host
 from tests.resize_fixture import ResizeCase
-from tests.test_sf_teardown import TeardownFixture
+from tests.test_sf_teardown import TeardownFixture, step_2_undo_line
 
 #: What diskutil prints when Spotlight holds the volume: an obvious fake PID.
 _MDS = (
@@ -244,7 +244,7 @@ class TeardownRetryTest(TeardownFixture):
         self.assertIn("FAILED at step 3:", text)
         self.assertIn(_MDS, text)
         self.assertIn(
-            f"Recovery, most recent first:\n  sudo tmutil addexclusion -v {self.folder}",
+            "Recovery, most recent first:\n  " + step_2_undo_line(self.folder),
             text,
         )
 

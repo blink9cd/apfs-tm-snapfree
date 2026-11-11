@@ -51,6 +51,7 @@ from sf_plan import (
     Step,
     command_step,
     confirmed,
+    comment_text,
     render,
     run_plan,
 )
@@ -105,6 +106,15 @@ _STILL_EXCLUDED = (
     "{path} is a plain folder again and its data is safe there, but Time Machine still "
     "excludes it.\nSee why with {check}; {fix} is the likely fix. Nothing else is "
     "left to do or undo."
+)
+#: Step 2's recovery line: no command undoes it while that would matter. Until step 6
+#: removes the fstab line, diskutil applies its nobrowse to a mount of the volume even
+#: without -mountOptions, so no mount this tool prints is visible; Time Machine skips a
+#: nobrowse volume with or without an exclusion, and addexclusion -v adds nothing on one.
+_NO_UNDO_FOR_INCLUDE = (
+    "# step 2 needs no undo: while the fstab line mounts {path} nobrowse, Time Machine "
+    "skips the volume without an exclusion of its own, and addexclusion -v adds nothing "
+    "on a nobrowse mount"
 )
 #: The placeholder the uncovered folder's recovery shows until step 4 has run.
 _UNCOVERED_PLACEHOLDER = "<recreate the uncovered folder>"
@@ -253,7 +263,8 @@ def _copy_step(host: Host, plan: Teardown) -> Step:
         confirm=matches,
         create_mode=plan.mode,
         recover=(
-            f"# the restore copy at {plan.restore} can be removed once {plan.path} "
+            f"# the restore copy at {comment_text(plan.restore)} can be removed once "
+            f"{comment_text(plan.path)} "
             "is checked"
         ),
     )
@@ -270,7 +281,7 @@ def _include_step(host: Host, plan: Teardown) -> Step:
         host,
         ["sudo", "tmutil", "removeexclusion", "-v", path],
         COMMAND_TIMEOUT,
-        recover=["sudo", "tmutil", "addexclusion", "-v", path],
+        recover=_NO_UNDO_FOR_INCLUDE.format(path=comment_text(plan.path)),
         confirm=lambda: sf_macos.require_not_explicitly_excluded(host, plan.uuid),
     )
 
