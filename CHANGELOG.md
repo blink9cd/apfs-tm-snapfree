@@ -2,6 +2,14 @@
 
 Notable changes to this project, newest first.
 
+## 0.1.4 - 2026-11-17
+
+### Changed
+
+- The bundled `stdio_utf8` tests write the invisible format-control characters they
+  check as escapes, so no test file holds a character a reader cannot see. Comments and
+  docstrings gain serial commas. No tool behavior changed.
+
 ## 0.1.3 - 2026-11-11
 
 ### Fixed

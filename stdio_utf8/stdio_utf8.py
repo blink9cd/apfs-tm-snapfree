@@ -61,7 +61,7 @@ CAPTURE_ERRORS = "replace"
 
 #: Error policy for a message a tool prints, never for its data: stderr's own, which
 #: ``force_utf8_streams`` keeps, and ``printable``'s. ``backslashreplace`` spells a lone
-#: surrogate as its escape (a backslash, ``u`` and four hex digits), which is visible,
+#: surrogate as its escape (a backslash, ``u``, and four hex digits), which is visible,
 #: ASCII, and names the byte the shell or filesystem could not decode.
 ESCAPE_ERRORS = "backslashreplace"
 
@@ -137,7 +137,7 @@ def printable(text: str) -> str:
 #: The first code point past Latin-1: below it an escape takes two hex digits.
 _LATIN1_END = 0x100
 
-#: Every control character a terminal can act on: C0 (tab and newline among them), DEL
+#: Every control character a terminal can act on: C0 (tab and newline among them), DEL,
 #: and C1. Then the direction marks (the Arabic letter mark among them), embeddings,
 #: overrides and isolates, and the line and paragraph separators, each of which can make
 #: a printed name read as another.
@@ -190,7 +190,7 @@ def print_escaped(line: str, stream: IO[str]) -> None:
 class EscapingArgumentParser(argparse.ArgumentParser):
     """An ``argparse.ArgumentParser`` whose every message goes through ``printable``.
 
-    argparse writes usage, help, errors and ``--version`` through the one method
+    argparse writes usage, help, errors, and ``--version`` through the one method
     overridden here, so none of them raises on a strict stream. Once
     ``force_utf8_streams`` has run, errors go to a stderr that escapes by itself; help and
     ``--version`` go to stdout, which stays strict, and that is where this class earns its

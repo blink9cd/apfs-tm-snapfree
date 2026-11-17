@@ -12,7 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import stdio_utf8  # noqa: E402 - import follows the sys.path bootstrap above
+import stdio_utf8
 
 #: What ``surrogateescape`` makes of the byte 0xFF in argv or a file name.
 _LONE = "\udcff"
